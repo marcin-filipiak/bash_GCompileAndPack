@@ -2,7 +2,7 @@
 
 # https://github.com/marcin-filipiak/bash_GCompileAndPack
 
-params="-lcrypto"
+params="`pkg-config --cflags --libs gtk+-3.0`"
 
 # package name from control file
 package_name=$(grep 'Package:' control | cut -d' ' -f2)
@@ -13,7 +13,14 @@ echo "--------------GCompileAndPack--------------"
 echo "-------------------------------------------"
 echo "                COMPILATION"
 echo "-------------------------------------------"
-g++ -o bin/$package_name src/$package_name.cpp $params
+g++ -o bin/$package_name src/$package_name.cpp $params  2> error_log.txt
+# Sprawdzanie, czy plik error_log.txt jest pusty
+if [ -s error_log.txt ]; then
+  echo "---Errors during compilation---"
+  # Wyświetlanie błędów na ekranie z paginacją
+  more error_log.txt
+fi  
+rm -rf error_log.txt
 echo "-------------------------------------------"
 echo "             END OF COMPILATION"
 echo "-------------------------------------------"
